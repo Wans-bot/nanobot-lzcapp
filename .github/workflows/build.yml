@@ -35,6 +35,13 @@ jobs:
       - name: Install lzc-cli
         run: npm i -g @lazycatcloud/lzc-cli@2.0.9
 
+      - name: Pre-pull base images
+        run: |
+          set -euo pipefail
+          # embed 构建器会对父镜像做 docker image inspect，镜像不在本地就直接失败。
+          docker pull node:24-bookworm-slim
+          docker pull ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
       - name: Build LPK
         run: |
           set -euo pipefail
