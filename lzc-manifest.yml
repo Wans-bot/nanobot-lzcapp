@@ -54,7 +54,7 @@ application:
             })();
 services:
   nanobot:
-    image: embed:nanobot
+    image: registry.lazycat.cloud/wans/wans-nanobot-0.4.0:ea5a5971ddcbb01a
     environment:
       TZ: Asia/Shanghai
       # 首装引导：把 gateway 与 websocket 的监听地址改成 0.0.0.0，
