@@ -46,7 +46,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          lzc-cli project release -o dist --log info
+          # -o 要的是文件路径，不是目录
+          lzc-cli project release -o dist/nanobot.lpk --log info
           ls -l dist
 
       - uses: actions/upload-artifact@v4
