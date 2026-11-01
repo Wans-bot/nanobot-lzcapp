@@ -2,8 +2,4 @@ pkgout: dist
 icon: icon.png
 manifest: lzc-manifest.yml
 package: package.yml
-images:
-  nanobot:
-    dockerfile: upstream/Dockerfile
-    context: upstream
-    builder: local
+contentdir: content
