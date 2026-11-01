@@ -2,4 +2,3 @@ pkgout: dist
 icon: icon.png
 manifest: lzc-manifest.yml
 package: package.yml
-contentdir: content
