@@ -55,6 +55,8 @@ application:
 services:
   nanobot:
     image: registry.lazycat.cloud/wans/wans-nanobot-0.4.0:ea5a5971ddcbb01a
+    # 上游 compose 用 command: ["gateway"] 启动；镜像默认 CMD 是 `nanobot status`（打印完就退出）
+    command: gateway
     environment:
       TZ: Asia/Shanghai
       # 首装引导：把 gateway 与 websocket 的监听地址改成 0.0.0.0，
