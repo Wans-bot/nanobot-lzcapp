@@ -1,0 +1,66 @@
+usage: nanobot
+application:
+  subdomain: nanobot
+  health_check:
+    test_url: http://nanobot:8765/
+    disable: false
+    start_period: 120s
+    timeout: 5s
+  upstreams:
+    - location: /
+      backend: http://nanobot:8765
+  injects:
+    # ── 免密登录 ─────────────────────────────────────────────────────────────
+    # nanobot 的 WebUI 首屏是一个「输入访问密码」的 React 表单，密码来自
+    # channels.websocket.tokenIssueSecret（首装时由 entrypoint 写进 config.json，
+    # 值取自环境变量 NANOBOT_WEB_TOKEN）。
+    # 这里用 stable_secret 在「容器环境变量」和「浏览器注入脚本」两侧取同一个值，
+    # 用户永远不需要看到或手打这个密码。
+    # 表单是受控组件，直接改 value 不会触发 React 更新，所以必须走原生 setter
+    # + input 事件，再 requestSubmit。
+    # when 必须是 /*：SPA 客户端路由不会重新加载文档，只匹配 / 的注入会漏掉登录页。
+    - id: nanobot-autologin
+      'on': browser
+      auth_required: false
+      when:
+        - /*
+      do:
+        - src: |
+            (async () => {
+              const PASSWORD = {{ stable_secret "NANOBOT_WEB_TOKEN" | toJson }};
+              const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+              const nativeSet = (el, value) => {
+                const desc = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value");
+                desc.set.call(el, value);
+                el.dispatchEvent(new Event("input", { bubbles: true }));
+              };
+              // 已经有会话就直接退出，别打扰正常使用。
+              if (document.querySelector('[data-testid="thread-list"], nav [role="list"], #composer, textarea')) return;
+              for (let i = 0; i < 60; i++) {
+                const input = document.querySelector("#webui-access-password");
+                if (input && !input.disabled) {
+                  nativeSet(input, PASSWORD);
+                  await sleep(200);
+                  const form = input.closest("form");
+                  if (form && typeof form.requestSubmit === "function") {
+                    form.requestSubmit();
+                  } else if (form) {
+                    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+                  }
+                  return;
+                }
+                await sleep(250);
+              }
+            })();
+services:
+  nanobot:
+    image: embed:nanobot
+    environment:
+      TZ: Asia/Shanghai
+      # 首装引导：把 gateway 与 websocket 的监听地址改成 0.0.0.0，
+      # 否则容器内的 127.0.0.1 绑定对外不可达。
+      NANOBOT_DOCKER_BOOTSTRAP: '1'
+      # 与注入脚本同源的 WebUI 访问密码（stable_secret 在重装 / 升级后保持不变）。
+      NANOBOT_WEB_TOKEN: '{{ stable_secret "NANOBOT_WEB_TOKEN" }}'
+    binds:
+      - /lzcapp/var/nanobot:/home/nanobot/.nanobot

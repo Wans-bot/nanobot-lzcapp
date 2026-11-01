@@ -1,0 +1,49 @@
+name: build-lpk
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream source
+        env:
+          UPSTREAM_REPO: HKUDS/nanobot
+          UPSTREAM_TAG: v0.4.0
+        run: |
+          set -euo pipefail
+          mkdir -p upstream
+          curl -fsSL "https://codeload.github.com/${UPSTREAM_REPO}/tar.gz/refs/tags/${UPSTREAM_TAG}" \
+            | tar xz -C upstream --strip-components=1
+          test -f upstream/Dockerfile
+          test -f upstream/entrypoint.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install lzc-cli
+        run: npm i -g @lazycatcloud/lzc-cli@2.0.9
+
+      - name: Build LPK
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          lzc-cli project release -o dist --log info
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lpk
+          path: dist/*.lpk
+          if-no-files-found: error

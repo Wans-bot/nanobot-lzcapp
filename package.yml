@@ -1,0 +1,50 @@
+package: cloud.lazycat.app.nanobot
+version: 0.4.0
+name: nanobot
+description: 自托管的 AI 智能体网关：网页端对话、自带模型接入、工具调用与会话管理，数据全部留在本机。
+author: HKUDS
+license: MIT
+homepage: https://github.com/HKUDS/nanobot
+min_os_version: 1.6.0
+permissions:
+  required:
+    - net.internet
+  optional: []
+locales:
+  zh-CN:
+    name: nanobot 智能体
+    description: 自托管的 AI 智能体网关，自带中文网页界面。填入任意云端大模型的 API Key 就能对话，支持工具调用、长会话记忆与多渠道接入，所有数据都留在自己的微服上。
+    usage: |
+      nanobot 是一个跑在自己机器上的 AI 智能体，网页端打开就能聊天。
+
+      首次使用：
+      1. 打开应用会自动登录，不需要手打账号密码。
+      2. 进右上角「设置 → 模型」，选一个模型服务商（OpenAI / Anthropic / DeepSeek / 通义等），
+         把对应的 API Key 填进去保存。
+      3. 回首页发一条消息，能收到回复就说明配置成功。
+
+      常用操作：
+      - 对话：首页输入框直接聊，支持多轮上下文；左侧可以新建、切换、重命名会话。
+      - 模型：可以同时配置多个服务商，在会话里随时切换。
+      - 工具：模型支持工具调用时会自动读写文件、跑命令（在应用自己的沙箱目录里）。
+      - 渠道：设置里可以再接微信、钉钉、Telegram 等外部渠道，把同一个智能体挂到聊天软件上。
+
+      说明：
+      - 会话、记忆、配置都保存在应用数据目录，重启和升级都不会丢。
+      - 模型是调用云端 API，本机不需要显卡，也不需要下载模型。
+  en-US:
+    name: nanobot
+    description: >-
+      A self-hosted AI agent gateway with a built-in web UI. Plug in any cloud model API key and chat — with tool use, long-term memory and multi-channel support, all data staying on your own box.
+    usage: |
+      nanobot is an AI agent that runs on your own machine. Open the web UI and start chatting.
+
+      First run:
+      1. The app signs you in automatically — no password to type.
+      2. Open Settings → Models, pick a provider (OpenAI / Anthropic / DeepSeek / Qwen, etc.)
+         and paste the matching API key.
+      3. Send a message on the home screen to confirm the setup.
+
+      Notes:
+      - Sessions, memory and settings live in the app data directory and survive restarts and upgrades.
+      - Models are called through cloud APIs, so no GPU and no local model download is required.
