@@ -48,7 +48,7 @@ jobs:
               - location: /
                 backend: http://web:80
           services:
-            - name: web
+            web:
               image: embed:web
           EOF
           printf '\x89PNG\r\n\x1a\n' > icon.png
